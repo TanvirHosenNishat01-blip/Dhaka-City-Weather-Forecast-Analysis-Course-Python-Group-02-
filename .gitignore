@@ -1,0 +1,12 @@
+venv/
+__pycache__/
+*.pyc
+src/__pycache__/
+.vscode/
+.idea/
+data/*.csv
+output/*.txt
+output/*.json
+output/*.csv
+!output/.gitkeep
+!assets/.gitkeep
