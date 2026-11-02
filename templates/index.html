@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dhaka Weather Intelligence & Scientific Diagram Lab</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .lang-en { display: none !important; }
+        body.english-mode .lang-bn { display: none !important; }
+        body.english-mode .lang-en { display: inline-block !important; }
+        .view-panel { display: none; }
+        .view-panel.active { display: block; animation: fadeIn 0.2s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+        input[type=range] { accent-color: #10b981; }
+        @media print {
+            aside, #filterForm, .no-print { display: none !important; }
+            main { padding: 0 !important; max-width: 100% !important; }
+            body { background: white !important; color: black !important; }
+            .bg-\[\#0e1626\], .bg-slate-950 { background: #f8fafc !important; color: black !important; border-color: #cbd5e1 !important; }
+        }
+    </style>
+</head>
+<body class="bg-[#080d16] text-slate-100 min-h-screen flex font-sans antialiased">
+
+    <!-- LEFT FIXED NAVIGATION SIDEBAR -->
+    <aside class="w-64 bg-[#060a12] border-r border-slate-800/90 flex flex-col justify-between shrink-0 h-screen sticky top-0 p-4 z-50">
+        <div class="space-y-4 overflow-y-auto pr-1">
+            <!-- Brand Header -->
+            <div class="flex items-center gap-3 px-2 py-1">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-emerald-500/20">
+                    <i class="fa-solid fa-atom"></i>
+                </div>
+                <div>
+                    <h2 class="text-sm font-black text-white tracking-wide uppercase">DHAKA WEATHER</h2>
+                    <p class="text-[10px] text-emerald-400 font-semibold">AIUB CSC 4162 | Group 02</p>
+                </div>
+            </div>
+
+            <!-- Language Switcher -->
+            <div class="px-1">
+                <button type="button" onclick="toggleLang()" class="w-full py-2 px-3 rounded-xl bg-slate-900 border border-slate-700 hover:border-emerald-500 flex items-center justify-between text-xs text-slate-200 transition">
+                    <span class="flex items-center gap-2">
+                        <i class="fa-solid fa-language text-emerald-400"></i>
+                        <span class="lang-bn">ভাষা: <strong>বাংলা</strong></span>
+                        <span class="lang-en">Lang: <strong>English</strong></span>
+                    </span>
+                    <span class="bg-emerald-500/20 text-emerald-300 text-[10px] px-2 py-0.5 rounded font-mono font-bold">EN/বাংলা</span>
+                </button>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="space-y-1 text-xs font-semibold">
+                <button type="button" data-target="v-overview" onclick="openView('v-overview', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition text-left">
+                    <i class="fa-solid fa-gauge-high w-4 text-emerald-400"></i>
+                    <span class="lang-bn">ওভারভিউ ও প্ল্যানার</span><span class="lang-en">Overview & Commute</span>
+                </button>
+                <button type="button" data-target="v-simulator" onclick="openView('v-simulator', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition text-left">
+                    <i class="fa-solid fa-sliders w-4 text-amber-400"></i>
+                    <span class="lang-bn">লাইভ What-If সিমুলেটর ★</span><span class="lang-en">Live What-If Simulator ★</span>
+                </button>
+                <button type="button" data-target="v-diagrams" onclick="openView('v-diagrams', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition text-left">
+                    <i class="fa-solid fa-compass-drafting w-4 text-cyan-400"></i>
+                    <span class="lang-bn">সায়েন্টিফিক ডায়াগ্রাম ল্যাব ★</span><span class="lang-en">Scientific Diagrams ★</span>
+                </button>
+                <button type="button" data-target="v-trends" onclick="openView('v-trends', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition text-left">
+                    <i class="fa-solid fa-chart-line w-4 text-sky-400"></i>
+                    <span class="lang-bn">গ্রাফিক্যাল ট্রেন্ড (Trends)</span><span class="lang-en">Graphical Trends</span>
+                </button>
+                <button type="button" data-target="v-thana" onclick="openView('v-thana', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition text-left">
+                    <i class="fa-solid fa-city w-4 text-indigo-400"></i>
+                    <span class="lang-bn">৮-থানা ম্যাট্রিক্স ও রাডার</span><span class="lang-en">8-Thana Matrix & Radar</span>
+                </button>
+                <button type="button" data-target="v-health" onclick="openView('v-health', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition text-left">
+                    <i class="fa-solid fa-heart-pulse w-4 text-rose-400"></i>
+                    <span class="lang-bn">স্বাস্থ্য, ডেঙ্গু ও গাইডলাইন</span><span class="lang-en">Health & Dengue Watch</span>
+                </button>
+                <button type="button" data-target="v-drainage" onclick="openView('v-drainage', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition text-left">
+                    <i class="fa-solid fa-water w-4 text-cyan-400"></i>
+                    <span class="lang-bn">ড্রেনেজ ও জলাবদ্ধতা</span><span class="lang-en">Drainage & Runoff</span>
+                </button>
+                <button type="button" data-target="v-numpy" onclick="openView('v-numpy', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition text-left">
+                    <i class="fa-solid fa-square-root-variable w-4 text-purple-400"></i>
+                    <span class="lang-bn">NumPy ও ফোরকাস্ট যাচাই</span><span class="lang-en">NumPy & MAE/RMSE</span>
+                </button>
+                <button type="button" data-target="v-extremes" onclick="openView('v-extremes', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition text-left">
+                    <i class="fa-solid fa-triangle-exclamation w-4 text-amber-400"></i>
+                    <span class="lang-bn">চরম আবহাওয়া স্ক্রিনিং</span><span class="lang-en">Extreme Events Log</span>
+                </button>
+                <button type="button" data-target="v-records" onclick="openView('v-records', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition text-left">
+                    <i class="fa-solid fa-table-list w-4 text-slate-300"></i>
+                    <span class="lang-bn">ঘণ্টাওয়ারী লগ ও লাইভ ফিল্টার</span><span class="lang-en">Hourly Log & Live Filter</span>
+                </button>
+                <button type="button" data-target="v-crud" onclick="openView('v-crud', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition text-left">
+                    <i class="fa-solid fa-database w-4 text-emerald-400"></i>
+                    <span class="lang-bn">CRUD ও ভ্যালিডেশন ল্যাব</span><span class="lang-en">CRUD & Validation Lab</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Export & Print Center -->
+        <div class="pt-3 border-t border-slate-800 space-y-2">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block px-1">
+                <span class="lang-bn">এক্সপোর্ট ও রিপোর্ট প্রিন্ট</span><span class="lang-en">Export & Print</span>
+            </span>
+            <div class="grid grid-cols-3 gap-1.5">
+                <a href="/export/txt?year={{ selected_year }}&month={{ selected_month }}&day={{ selected_day }}&thana={{ selected_thana }}" class="flex items-center justify-center gap-1 bg-slate-900 hover:bg-emerald-600 hover:text-white border border-slate-700 text-slate-200 text-[10px] font-bold py-1.5 rounded-lg transition">
+                    <i class="fa-solid fa-file-lines text-emerald-400"></i> TXT
+                </a>
+                <a href="/export/json?year={{ selected_year }}&month={{ selected_month }}&day={{ selected_day }}&thana={{ selected_thana }}" class="flex items-center justify-center gap-1 bg-slate-900 hover:bg-sky-600 hover:text-white border border-slate-700 text-slate-200 text-[10px] font-bold py-1.5 rounded-lg transition">
+                    <i class="fa-solid fa-file-code text-sky-400"></i> JSON
+                </a>
+                <button type="button" onclick="window.print()" class="flex items-center justify-center gap-1 bg-slate-900 hover:bg-purple-600 hover:text-white border border-slate-700 text-slate-200 text-[10px] font-bold py-1.5 rounded-lg transition">
+                    <i class="fa-solid fa-print text-purple-400"></i> Print
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN WORKSPACE -->
+    <main class="flex-1 p-6 md:p-8 space-y-6 overflow-y-auto max-w-7xl">
+
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-slate-800 gap-4">
+            <div>
+                <h1 class="text-2xl font-black text-white tracking-tight">
+                    <span class="lang-bn">ঢাকা আবহাওয়া, সায়েন্টিফিক ডায়াগ্রাম ও ডিসিশন ইন্টেলিজেন্স সিস্টেম</span>
+                    <span class="lang-en">Dhaka Weather Scientific Diagram & Decision Intelligence Lab</span>
+                </h1>
+                <p class="text-xs text-slate-400 mt-1">
+                    <span class="lang-bn">নাসা পাওয়ার ডেটাসেট (২০১৯-২০২৪) | মোট পর্যবেক্ষণ: {{ total_records }} ঘণ্টা | অঞ্চল: <strong class="text-emerald-400">{{ selected_thana }}</strong></span>
+                    <span class="lang-en">NASA POWER Dataset (2019-2024) | Active Observations: {{ total_records }} hrs | Target: <strong class="text-emerald-400">{{ selected_thana }}</strong></span>
+                </p>
+            </div>
+            <div class="flex items-center gap-2 no-print">
+                <button type="button" onclick="openView('v-diagrams', null)" class="bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-compass-drafting"></i>
+                    <span class="lang-bn">ডায়াগ্রাম ল্যাব</span><span class="lang-en">Diagram Lab</span>
+                </button>
+                <div class="inline-flex items-center gap-2 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg text-xs font-semibold text-emerald-400">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span class="lang-bn">১০০% ডেটা ইন্টিগ্রিটি</span><span class="lang-en">100% Data Integrity</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Global Filter Form -->
+        <div class="bg-[#0e1626] border border-slate-800 rounded-2xl p-4 shadow-xl no-print">
+            <form method="POST" action="/" id="filterForm" class="flex flex-wrap items-center gap-3">
+                <input type="hidden" name="active_tab" id="activeTabInput" value="{{ active_tab }}">
+
+                <div class="flex items-center gap-2 text-xs font-bold uppercase text-slate-400">
+                    <i class="fa-solid fa-location-dot text-emerald-400"></i>
+                    <span class="lang-bn">থানা:</span><span class="lang-en">Thana:</span>
+                </div>
+                <select name="thana" class="bg-slate-950 border border-slate-700 text-xs rounded-lg px-3 py-2 text-emerald-300 font-bold focus:outline-none focus:border-emerald-500">
+                    {% for t_name, t_val in thanas.items() %}
+                    <option value="{{ t_name }}" {% if t_name == selected_thana %}selected{% endif %}>
+                        {{ t_name }} (UHI: {{ t_val.uhi }})
+                    </option>
+                    {% endfor %}
+                </select>
+
+                <div class="h-4 w-px bg-slate-700 hidden sm:block"></div>
+
+                <div class="flex items-center gap-2 text-xs font-bold uppercase text-slate-400">
+                    <i class="fa-regular fa-calendar text-sky-400"></i>
+                    <span class="lang-bn">তারিখ:</span><span class="lang-en">Date:</span>
+                </div>
+                <select name="year" class="bg-slate-950 border border-slate-700 text-xs rounded-lg px-2.5 py-2 text-slate-200 font-semibold">
+                    {% for y in available_years %}
+                    <option value="{{ y }}" {% if y == selected_year %}selected{% endif %}>{{ y }}</option>
+                    {% endfor %}
+                </select>
+                <select name="month" class="bg-slate-950 border border-slate-700 text-xs rounded-lg px-2.5 py-2 text-slate-200 font-semibold">
+                    {% for m in range(1, 13) %}
+                    <option value="{{ m }}" {% if m == selected_month %}selected{% endif %}>Month {{ "%02d"|format(m) }}</option>
+                    {% endfor %}
+                </select>
+                <input type="number" name="day" min="1" max="31" value="{{ selected_day }}" class="w-16 bg-slate-950 border border-slate-700 text-xs rounded-lg px-2 py-2 text-slate-200 text-center font-bold">
+
+                <button type="submit" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs px-4 py-2 rounded-lg transition shadow-md shadow-emerald-500/20">
+                    <span class="lang-bn">ফিল্টার প্রয়োগ করুন</span><span class="lang-en">Apply Filter</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- 1. VIEW: OVERVIEW & 24H PLANNER -->
+        <!-- ========================================================= -->
+        <div id="v-overview" class="view-panel space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-[#0e1626] border border-slate-800 rounded-xl p-4">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
+                        <span class="lang-bn">{{ selected_thana }} তাপমাত্রা (দুপুর ১২টা)</span><span class="lang-en">{{ selected_thana }} Temp (12:00 PM)</span>
+                    </span>
+                    <p class="text-3xl font-black text-emerald-400 mt-1">{{ mid_rec.temp }}°C</p>
+                    <span class="text-xs text-slate-400">Feels Like: {{ mid_rec.feels_like }}°C</span>
+                </div>
+                <div class="bg-[#0e1626] border border-slate-800 rounded-xl p-4">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
+                        <span class="lang-bn">রোলিং ফোরকাস্ট (±σ)</span><span class="lang-en">Rolling Forecast (±σ)</span>
+                    </span>
+                    <p class="text-3xl font-black text-sky-400 mt-1">{{ "%.2f"|format(forecast.projected_temperature) }}°C</p>
+                    <span class="text-xs text-slate-400">Band: {{ forecast.expected_range[0] }}° - {{ forecast.expected_range[1] }}°C</span>
+                </div>
+                <div class="bg-[#0e1626] border border-slate-800 rounded-xl p-4">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
+                        <span class="lang-bn">ডেঙ্গু প্রজনন ঝুঁকি</span><span class="lang-en">Dengue Vector Risk</span>
+                    </span>
+                    <p class="text-lg font-black text-rose-400 mt-1">{{ novel.dengue_risk }}</p>
+                    <span class="text-xs text-slate-400">Bio-Index Score: {{ novel.dengue_score }}/100</span>
+                </div>
+                <div class="bg-[#0e1626] border border-slate-800 rounded-xl p-4">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
+                        <span class="lang-bn">সোলার ও গ্রিড কুলিং লোড</span><span class="lang-en">Solar & Grid Demand</span>
+                    </span>
+                    <p class="text-2xl font-black text-amber-400 mt-1">{{ novel.solar_index }} <span class="text-xs font-normal">kWh/kWp</span></p>
+                    <span class="text-xs text-slate-400">DESCO Cooling Surge: {{ novel.cooling_load_pct }}%</span>
+                </div>
+            </div>
+
+            <!-- 24-Hour Smart Commute Planner Strip -->
+            <div class="bg-[#0e1626] border border-slate-800 rounded-2xl p-5 space-y-3">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
+                        <i class="fa-solid fa-person-walking-luggage text-emerald-400"></i>
+                        <span class="lang-bn">২৪-ঘণ্টার স্মার্ট যাতায়াত ও আউটডোর প্ল্যানার ({{ selected_thana }})</span>
+                        <span class="lang-en">24-Hour Smart Commute & Outdoor Activity Planner ({{ selected_thana }})</span>
+                    </h3>
+                    <div class="flex items-center gap-3 text-[11px]">
+                        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> <span class="lang-bn">নিরাপদ</span><span class="lang-en">Optimal</span></span>
+                        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> <span class="lang-bn">সতর্কতা</span><span class="lang-en">Caution</span></span>
+                        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> <span class="lang-bn">ঝুঁকিপূর্ণ</span><span class="lang-en">Avoid</span></span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-6 sm:grid-cols-12 lg:grid-cols-24 gap-1.5 pt-1">
+                    {% for r in hourly_records %}
+                    <div class="p-2 rounded-lg border text-center transition hover:scale-105 cursor-pointer
+                        {% if r.commute_color == 'rose' %}bg-rose-500/15 border-rose-500/40 text-rose-300
+                        {% elif r.commute_color == 'amber' %}bg-amber-500/15 border-amber-500/40 text-amber-300
+                        {% else %}bg-emerald-500/10 border-emerald-500/30 text-emerald-300{% endif %}"
+                        title="{{ '%02d:00'|format(r.hour) }} | Temp: {{ r.temp }}°C | Feels: {{ r.feels_like }}°C | Rain: {{ r.rain }}mm">
+                        <span class="text-[10px] font-mono block opacity-75">{{ "%02d"|format(r.hour) }}h</span>
+                        <span class="text-xs font-black block mt-0.5">{{ "%.0f"|format(r.temp) }}°</span>
+                        <span class="text-[9px] block mt-0.5 opacity-90">{{ r.rain }}m</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Synoptic Situation -->
+            <div class="bg-[#0e1626] border border-slate-800 rounded-2xl p-5 space-y-2">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300">
+                    <span class="lang-bn">সিনপটিক পরিস্থিতি ও আবহাওয়া সারসংক্ষেপ</span>
+                    <span class="lang-en">Synoptic Situation & Meteorological Summary</span>
+                </h3>
+                <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-emerald-300">
+                    <span class="lang-bn">{{ cond_bn }} | দিবারাত্রির তাপমাত্রার পার্থক্য (DTR): {{ dtr }}°C</span>
+                    <span class="lang-en">{{ cond_en }} | Diurnal Temperature Swing (DTR): {{ dtr }}°C</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- 2. VIEW: SCIENTIFIC DIAGRAM LAB (★ BRAND NEW 10X FEATURE) -->
+        <!-- ========================================================= -->
+        <div id="v-diagrams" class="view-panel space-y-6">
+            <div class="bg-[#0e1626] border border-slate-800 rounded-2xl p-6 space-y-6">
+                <div class="border-b border-slate-800 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                        <h2 class="text-lg font-black text-cyan-400 flex items-center gap-2">
+                            <i class="fa-solid fa-compass-drafting"></i>
+                            <span class="lang-bn">উচ্চতর বৈজ্ঞানিক ও বায়োমেটিওরোলজিক্যাল ডায়াগ্রাম ল্যাব</span>
+                            <span class="lang-en">Advanced Scientific & Biometeorological Diagram Laboratory</span>
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-1">
+                            <span class="lang-bn">বিশুদ্ধ NumPy ম্যাট্রিক্স, ফিজিওলজিক্যাল আর্ট গেজ এবং উইন্ড-ভেক্টর ডায়াগ্রাম।</span>
+                            <span class="lang-en">Pure NumPy Correlation Heatmap, Physiological Stress Arc Gauge & Wind Vectors.</span>
+                        </p>
+                    </div>
+                    <span class="text-xs bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 px-3 py-1 rounded-full font-mono">
+                        Vectorized Engine Active
+                    </span>
+                </div>
+
+                <!-- 3 Scientific Diagrams Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                    <!-- DIAGRAM 1: 5x5 Pairwise Pearson Correlation Heatmap -->
+                    <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+                                <h3 class="text-xs font-black uppercase tracking-wider text-slate-200">
+                                    <span class="lang-bn">১. ৫x৫ পিয়ারসন সহসম্পর্ক ম্যাট্রিক্স (Heatmap)</span>
+                                    <span class="lang-en">1. 5x5 Pearson Correlation Heatmap</span>
+                                </h3>
+                                <span class="text-[10px] text-emerald-400 font-mono">NumPy r-val</span>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-center text-[10px] border-collapse font-mono">
+                                    <thead>
+                                        <tr class="text-slate-400">
+                                            <th class="p-1 text-left">Param</th>
+                                            <th class="p-1">T2M</th>
+                                            <th class="p-1">RH</th>
+                                            <th class="p-1">PS</th>
+                                            <th class="p-1">WS</th>
+                                            <th class="p-1">PREC</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-900">
+                                        {% for row in monthly_stats.corr_matrix %}
+                                        <tr>
+                                            <td class="p-1.5 text-left font-sans font-bold text-slate-300">{{ row.param.split(' ')[0] }}</td>
+                                            {% for val in row.vals %}
+                                            <td class="p-1.5 rounded font-bold
+                                                {% if val >= 0.8 %}bg-rose-500/40 text-rose-200
+                                                {% elif val >= 0.3 %}bg-amber-500/30 text-amber-200
+                                                {% elif val <= -0.5 %}bg-sky-500/40 text-sky-200
+                                                {% elif val <= -0.1 %}bg-indigo-500/30 text-indigo-200
+                                                {% else %}bg-slate-800/40 text-slate-400{% endif %}">
+                                                {{ "%.2f"|format(val) }}
+                                            </td>
+                                            {% endfor %}
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <p class="text-[10px] text-slate-500 mt-3 pt-2 border-t border-slate-900">
+                            * Correlation calculated over {{ monthly_stats.record_count }} observations using `np.corrcoef()`.
+                        </p>
+                    </div>
+
+                    <!-- DIAGRAM 2: Physiological Heat Stress Arc Gauge -->
+                    <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 flex flex-col justify-between items-center text-center">
+                        <div class="w-full">
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+                                <h3 class="text-xs font-black uppercase tracking-wider text-slate-200">
+                                    <span class="lang-bn">২. ফিজিওলজিক্যাল হিট স্ট্রেস গেজ</span>
+                                    <span class="lang-en">2. Heat Stress Dynamic Gauge</span>
+                                </h3>
+                                <span class="text-[10px] text-rose-400 font-mono">Steadman HI</span>
+                            </div>
+                            <div class="relative w-48 h-28 mx-auto mt-2">
+                                <canvas id="heatGaugeCanvas" width="192" height="112"></canvas>
+                                <div class="absolute bottom-0 inset-x-0 text-center">
+                                    <span class="text-2xl font-black text-rose-400">{{ health.apparent_temp }}°C</span>
+                                    <span class="text-[10px] text-slate-400 block">Peak Apparent Temp</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="w-full text-left bg-slate-900/60 p-2.5 rounded-lg border border-slate-800 mt-4 text-[11px]">
+                            <span class="font-bold text-slate-300">Level: <strong class="text-emerald-400">{{ health.risk_level }}</strong></span>
+                            <p class="text-slate-400 text-[10px] mt-0.5">Threshold triggers physiological cooling demand & hydration advisories.</p>
+                        </div>
+                    </div>
+
+                    <!-- DIAGRAM 3: Wind-Speed Vector & Kinetic Aerodynamics -->
+                    <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+                                <h3 class="text-xs font-black uppercase tracking-wider text-slate-200">
+                                    <span class="lang-bn">৩. অ্যারোডাইনামিক উইন্ড-স্পিড ভেক্টর</span>
+                                    <span class="lang-en">3. Aerodynamic Wind Polar Vector</span>
+                                </h3>
+                                <span class="text-[10px] text-amber-400 font-mono">WS10M m/s</span>
+                            </div>
+                            <div class="h-44">
+                                <canvas id="windPolarChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center text-[10px] text-slate-400 pt-2 border-t border-slate-900">
+                            <span>Mean Wind: <strong class="text-slate-200">{{ "%.2f"|format(monthly_stats.mean_wind) }} m/s</strong></span>
+                            <span>Kinetic Energy: <strong class="text-amber-400">Low-Moderate</strong></span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- 3. VIEW: INTERACTIVE "WHAT-IF" SIMULATOR -->
+        <!-- ========================================================= -->
+        <div id="v-simulator" class="view-panel space-y-6">
+            <div class="bg-[#0e1626] border border-slate-800 rounded-2xl p-6 space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 pb-4 gap-2">
+                    <div>
+                        <h2 class="text-lg font-black text-amber-400 flex items-center gap-2">
+                            <i class="fa-solid fa-sliders"></i>
+                            <span class="lang-bn">ইন্টারেক্টিভ "What-If" আবহাওয়া, হিটস্ট্রোক ও জলাবদ্ধতা সিমুলেটর</span>
+                            <span class="lang-en">Interactive "What-If" Microclimate, Heat-Stress & Flood Simulator</span>
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-1">
+                            <span class="lang-bn">স্লাইডার পরিবর্তন করে তাৎক্ষণিকভাবে ঢাকা শহরের যেকোনো আবহাওয়া পরিস্থিতির ঝুঁকি পরীক্ষা করুন।</span>
+                            <span class="lang-en">Adjust meteorological sliders in real time to simulate urban flash floods, physiological heat stress, and grid load.</span>
+                        </p>
+                    </div>
+                    <button type="button" onclick="resetSimulator()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-700 transition">
+                        <span class="lang-bn">রিসেট করুন</span><span class="lang-en">Reset Sliders</span>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-4 text-xs">
+                        <div>
+                            <div class="flex justify-between font-bold mb-1">
+                                <span><i class="fa-solid fa-temperature-high text-emerald-400 mr-1"></i> <span class="lang-bn">বায়ুর তাপমাত্রা (Air Temp):</span><span class="lang-en">Air Temperature (T2M):</span></span>
+                                <span id="simTempVal" class="text-emerald-400 font-mono text-sm">34.0 °C</span>
+                            </div>
+                            <input type="range" id="simTemp" min="10" max="48" step="0.5" value="34.0" oninput="runSimulation()" class="w-full cursor-pointer">
+                        </div>
+                        <div>
+                            <div class="flex justify-between font-bold mb-1">
+                                <span><i class="fa-solid fa-droplet text-sky-400 mr-1"></i> <span class="lang-bn">আপেক্ষিক আর্দ্রতা (Relative Humidity):</span><span class="lang-en">Relative Humidity (RH2M):</span></span>
+                                <span id="simRhVal" class="text-sky-400 font-mono text-sm">78 %</span>
+                            </div>
+                            <input type="range" id="simRh" min="20" max="100" step="1" value="78" oninput="runSimulation()" class="w-full cursor-pointer">
+                        </div>
+                        <div>
+                            <div class="flex justify-between font-bold mb-1">
+                                <span><i class="fa-solid fa-cloud-showers-heavy text-cyan-400 mr-1"></i> <span class="lang-bn">টানা ৬ ঘণ্টার বৃষ্টিপাত:</span><span class="lang-en">6-Hour Cumulative Rainfall:</span></span>
+                                <span id="simRainVal" class="text-cyan-400 font-mono text-sm">42 mm</span>
+                            </div>
+                            <input type="range" id="simRain" min="0" max="180" step="2" value="42" oninput="runSimulation()" class="w-full cursor-pointer">
+                        </div>
+                        <div>
+                            <div class="flex justify-between font-bold mb-1">
+                                <span><i class="fa-solid fa-wind text-amber-400 mr-1"></i> <span class="lang-bn">বাতাসের গতিবেগ:</span><span class="lang-en">Wind Speed (WS10M):</span></span>
+                                <span id="simWindVal" class="text-amber-400 font-mono text-sm">4.5 m/s</span>
+                            </div>
+                            <input type="range" id="simWind" min="0" max="25" step="0.5" value="4.5" oninput="runSimulation()" class="w-full cursor-pointer">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 text-xs">
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col justify-between">
+                            <span class="text-slate-400 font-bold"><span class="lang-bn">অনুভূত তাপমাত্রা (Feels-Like)</span><span class="lang-en">Simulated Heat Index</span></span>
+                            <p id="simFeelsOut" class="text-3xl font-black text-rose-400 my-1">41.2 °C</p>
+                            <span id="simHeatBadge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 w-max">DANGER / HEAT STROKE</span>
+                        </div>
+
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col justify-between">
+                            <span class="text-slate-400 font-bold"><span class="lang-bn">সম্ভাব্য রাস্তার জলাবদ্ধতা ({{ selected_thana }})</span><span class="lang-en">Est. Inundation ({{ selected_thana }})</span></span>
+                            <p id="simFloodOut" class="text-3xl font-black text-sky-400 my-1">18.5 cm</p>
+                            <span id="simFloodBadge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 w-max">SEVERE WATERLOGGING</span>
+                        </div>
+
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col justify-between">
+                            <span class="text-slate-400 font-bold"><span class="lang-bn">শ্রম সক্ষমতা ও সোলার আউটপুট</span><span class="lang-en">Workability & Solar Yield</span></span>
+                            <p id="simComfortOut" class="text-2xl font-black text-emerald-400 my-1">48% | 3.8 kWh</p>
+                            <span class="text-[10px] text-slate-400">Outdoor Productivity & PV</span>
+                        </div>
+
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col justify-between">
+                            <span class="text-slate-400 font-bold"><span class="lang-bn">ডেঙ্গু ঝুঁকি ও পাওয়ার গ্রিড লোড</span><span class="lang-en">Dengue Risk & Grid Surge</span></span>
+                            <p id="simDengueOut" class="text-2xl font-black text-purple-400 my-1">HIGH | 84% Load</p>
+                            <span class="text-[10px] text-slate-400">Aedes Vector & DESCO Surge</span>
+                        </div>
+
+                        <div class="col-span-2 bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                            <span class="text-amber-400 font-bold block mb-1"><i class="fa-solid fa-robot mr-1"></i> <span class="lang-bn">ডাইনামিক ডিসিশন সাপোর্ট অ্যাডভাইজরি:</span><span class="lang-en">Dynamic Decision Support Advisory:</span></span>
+                            <p id="simAdviceOut" class="text-slate-200 leading-relaxed"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- 4. VIEW: GRAPHICAL CLIMATE TRENDS -->
+        <!-- ========================================================= -->
+        <div id="v-trends" class="view-panel space-y-6">
+            <div class="bg-[#0e1626] border border-slate-800 rounded-2xl p-5">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                    <h2 class="text-base font-bold text-emerald-400 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-area"></i>
+                        <span class="lang-bn">২৪-ঘণ্টার তাপমাত্রা ও হিট ইনডেক্স ট্রেন্ড ({{ selected_thana }}: {{ selected_year }}-{{ "%02d"|format(selected_month) }}-{{ "%02d"|format(selected_day) }})</span>
+                        <span class="lang-en">24-Hour Temperature & Apparent Heat Index Curve ({{ selected_thana }}: {{ selected_year }}-{{ "%02d"|format(selected_month) }}-{{ "%02d"|format(selected_day) }})</span>
+                    </h2>
+                </div>
+                <div class="h-64">
+                    <canvas id="hourlyTrendChart"></canvas>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-[#0e1626] border border-slate-800 rounded-2xl p-5">
+                    <h3 class="text-sm font-bold text-sky-400 border-b border-slate-800 pb-2 mb-3">
+                        <span class="lang-bn">{{ selected_year }} সালের মাসিক গড় তাপমাত্রা ও বৃষ্টিপাত ট্রেন্ড</span>
+                        <span class="lang-en">{{ selected_year }} Monthly Seasonal Temp & Rainfall Trend</span>
+                    </h3>
+                    <div class="h-60">
+                        <canvas id="seasonalTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-[#0e1626] border border-slate-800 rounded-2xl p-5">
+                    <h3 class="text-sm font-bold text-amber-400 border-b border-slate-800 pb-2 mb-3">
+                        <span class="lang-bn">বহু-বার্ষিক জলবায়ু পরিবর্তন ট্রেন্ড (২০১৯–২০২৪)</span>
+                        <span class="lang-en">Multi-Year Climate Anomaly Comparison (2019–2024)</span>
+                    </h3>
+                    <div class="h-60">
+                        <canvas id="multiYearChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- 5. VIEW: 8-THANA COMPARATIVE MATRIX & RADAR -->
+        <!-- ========================================================= -->
+        <div id="v-thana" class="view-panel space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="bg-[#0e1626] border border-slate-800 rounded-2xl p-5 lg:col-span-2 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <h2 class="text-base font-bold text-emerald-400 flex items-center gap-2">
+                            <i class="fa-solid fa-city"></i>
+                            <span class="lang-bn">ঢাকা শহরের ৮ থানার তুলনামূলক মাইক্রোক্লাইমেট ম্যাট্রিক্স</span>
+                            <span class="lang-en">8-Thana Comparative Microclimate Matrix</span>
+                        </h2>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs text-slate-300">
+                            <thead class="bg-slate-950 text-slate-400 uppercase text-[10px] border-b border-slate-800">
+                                <tr>
+                                    <th class="py-2.5 px-3">Thana Zone</th>
+                                    <th class="py-2.5 px-3">UHI Class</th>
+                                    <th class="py-2.5 px-3">Peak Temp</th>
+                                    <th class="py-2.5 px-3">Feels Like</th>
+                                    <th class="py-2.5 px-3">Drainage Risk</th>
+                                    <th class="py-2.5 px-3">Est. Waterlog</th>
+                                    <th class="py-2.5 px-3">Comfort</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/60 font-mono">
+                                {% for tc in thana_comparison %}
+                                <tr class="{% if tc.name == selected_thana %}bg-emerald-500/10 border-l-4 border-emerald-400{% else %}hover:bg-slate-800/40{% endif %} transition">
+                                    <td class="py-2.5 px-3 font-sans font-bold text-white">{{ tc.name }}</td>
+                                    <td class="py-2.5 px-3 text-rose-400">{{ tc.uhi }} ({{ "%+.1f"|format(tc.offset) }}°)</td>
+                                    <td class="py-2.5 px-3 text-emerald-400 font-bold">{{ tc.peak_temp }}°C</td>
+                                    <td class="py-2.5 px-3 text-amber-300">{{ tc.feels_like }}°C</td>
+                                    <td class="py-2.5 px-3">{{ tc.drain_risk }}</td>
+                                    <td class="py-2.5 px-3 text-sky-400">{{ tc.flood_depth_cm }} cm</td>
+                                    <td class="py-2.5 px-3 text-emerald-300">{{ tc.comfort_score }}%</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-[#0e1626] border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-indigo-400 border-b border-slate-800 pb-2 mb-3">
+                            <span class="lang-bn">{{ selected_thana }} বনাম গুলশান ও পুরান ঢাকা (রাডার)</span>
+                            <span class="lang-en">{{ selected_thana }} Multi-Axis Radar Profile</span>
+                        </h3>
+                        <div class="h-64">
+                            <canvas id="thanaRadarChart"></canvas>
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-3 bg-slate-950 p-3 rounded-xl border border-slate-800">
+                        <span class="lang-bn">{{ thana_info.desc_bn }}</span>
+                        <span class="lang-en">{{ thana_info.desc_en }}</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- 6. VIEW: HEALTH, DENGUE & GUIDELINES -->
+        <!-- ========================================================= -->
+        <div id="v-health" class="view-panel space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-[#0e1626] border border-slate-800 rounded-2xl p-5 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
+                            <i class="fa-solid fa-heart-pulse text-rose-400"></i>
+                            <span class="lang-bn">বায়োমেটিওরোলজিক্যাল স্বাস্থ্য ও ডেঙ্গু সতর্কতা</span>
+                            <span class="lang-en">Biometeorological Health & Vector Risk</span>
+                        </h2>
+                        <span class="px-2.5 py-0.5 text-xs font-bold rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">
+                            {{ health.risk_level }}
+                        </span>
+                    </div>
+                    <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-slate-400 block"><span class="lang-bn">অনুভূত তাপমাত্রা (Peak Feels-Like):</span><span class="lang-en">Apparent Heat Index:</span></span>
+                            <span class="text-3xl font-black text-emerald-400">{{ health.apparent_temp }}°C</span>
+                        </div>
+                        <div class="text-right text-xs text-slate-400 font-mono">
+                            <span>Outdoor Workability: {{ novel.comfort_score }}%</span><br>
+                            <span>Dengue Score: {{ novel.dengue_score }}/100</span>
+                        </div>
+                    </div>
+                    <div class="p-3.5 bg-slate-950 rounded-xl border border-slate-800 text-xs">
+                        <span class="text-rose-400 font-bold block mb-1"><span class="lang-bn">ডেঙ্গু ও ভেক্টর প্রজনন পূর্বাভাস:</span><span class="lang-en">Dengue Vector Incubation Advisory:</span></span>
+                        <p class="text-slate-200"><span class="lang-bn">{{ novel.dengue_bn }}</span><span class="lang-en">{{ novel.dengue_en }}</span></p>
+                    </div>
+                    <div class="p-3.5 bg-slate-950 rounded-xl border border-slate-800 text-xs">
+                        <span class="text-purple-400 font-bold block mb-1"><span class="lang-bn">শ্বাসতন্ত্র সতর্কতা:</span><span class="lang-en">Respiratory Advisory:</span></span>
+                        <p class="text-slate-300"><span class="lang-bn">{{ resp_msg_bn }}</span><span class="lang-en">{{ resp_msg_en }}</span></p>
+                    </div>
+                </div>
+
+                <div class="bg-[#0e1626] border border-slate-800 rounded-2xl p-5 space-y-3">
+                    <div class="border-b border-slate-800 pb-3">
+                        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
+                            <i class="fa-solid fa-clipboard-check text-emerald-400"></i>
+                            <span class="lang-bn">নাগরিকদের জন্য বিশেষ নির্দেশনা (গাইডলাইন)</span>
+                            <span class="lang-en">Actionable Public Safety Guidelines</span>
+                        </h2>
+                    </div>
+                    <div class="space-y-2.5 text-xs">
+                        <div class="p-3 bg-slate-950 rounded-lg border-l-4 border-emerald-500">
+                            <strong class="text-emerald-400 block mb-0.5"><span class="lang-bn">১. সাধারণ পথচারী ও শিক্ষার্থী:</span><span class="lang-en">1. General Commuters & Students:</span></strong>
+                            <p class="text-slate-300"><span class="lang-bn">বেলা ১১:৩০ হতে ৩:৩০ পর্যন্ত সরাসরি রোদ এড়িয়ে ছাতা ও হালকা সুতি পোশাক পরিধান করুন। দৈনিক অন্তত ৩.৫ লিটার পানি পান করুন।</span><span class="lang-en">Avoid direct sun between 11:30 AM and 3:30 PM. Carry an umbrella, wear breathable cotton, and drink 3.5L water daily.</span></p>
+                        </div>
+                        <div class="p-3 bg-slate-950 rounded-lg border-l-4 border-amber-500">
+                            <strong class="text-amber-400 block mb-0.5"><span class="lang-bn">২. শ্রমজীবী ও রিকশাচালক:</span><span class="lang-en">2. Outdoor Workers & Rickshaw Pullers:</span></strong>
+                            <p class="text-slate-300"><span class="lang-bn">টানা কাজ পরিহার করে প্রতি ঘণ্টায় ছায়ায় ১০ মিনিট বিশ্রাম নিন এবং ইলেক্ট্রোলাইট ভারসাম্য রক্ষায় খাবার স্যালাইন (ORS) গ্রহণ করুন।</span><span class="lang-en">Take mandatory 10-minute shaded breaks every hour and consume Oral Rehydration Salts (ORS) to prevent heat exhaustion.</span></p>
+                        </div>
+                        <div class="p-3 bg-slate-950 rounded-lg border-l-4 border-rose-500">
+                            <strong class="text-rose-400 block mb-0.5"><span class="lang-bn">৩. প্রবীণ ও শিশু সুরক্ষা:</span><span class="lang-en">3. Elderly & Child Care:</span></strong>
+                            <p class="text-slate-300"><span class="lang-bn">উচ্চ আর্দ্রতায় দ্রুত পানিশূন্যতা দেখা দেয়। মাথা ঘোরা বা বমি ভাব দেখা দিলে দ্রুত শীতল স্থানে নিয়ে যান ও চিকিৎসকের পরামর্শ নিন।</span><span class="lang-en">High humidity accelerates dehydration. Move to cool ventilated areas immediately if dizziness or heat cramps occur.</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- 7. VIEW: DRAINAGE & RUNOFF -->
+        <!-- ========================================================= -->
+        <div id="v-drainage" class="view-panel space-y-6">
+            <div class="bg-[#0e1626] border border-slate-800 rounded-2xl p-6">
+                <div class="border-b border-slate-800 pb-3 mb-4 flex items-center justify-between">
+                    <h2 class="text-base font-bold text-amber-400 flex items-center gap-2">
+                        <i class="fa-solid fa-water"></i>
+                        <span class="lang-bn">নগর নিষ্কাশন ও জলাবদ্ধতা ট্র্যাকার ({{ selected_thana }})</span>
+                        <span class="lang-en">Urban Drainage & Waterlogging Monitor ({{ selected_thana }})</span>
+                    </h2>
+                    <span class="px-3 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/30 text-xs rounded-full font-bold">
+                        {{ thana_drain_status }}
+                    </span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 font-bold block mb-1"><span class="lang-bn">বৃষ্টিপাত পর্যবেক্ষণ (৬-ঘণ্টা উইন্ডো):</span><span class="lang-en">Cumulative Rainfall (6-hr Window):</span></span>
+                        <p class="text-3xl font-black text-sky-400">{{ drainage.total_rain_accumulated }} mm</p>
+                    </div>
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 font-bold block mb-1"><span class="lang-bn">ট্রাফিক ও যাতায়াত পরামর্শ:</span><span class="lang-en">Traffic & Commuter Advisory:</span></span>
+                        <p class="text-amber-300 font-semibold leading-relaxed"><span class="lang-bn">{{ thana_drain_msg_bn }}</span><span class="lang-en">{{ thana_drain_msg_en }}</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- 8. VIEW: NUMPY ANALYTICS & FORECAST EVALUATION -->
+        <!-- ========================================================= -->
+        <div id="v-numpy" class="view-panel space-y-6">
+            <div class="bg-[#0e1626] border border-slate-800 rounded-2xl p-6">
+                <div class="border-b border-slate-800 pb-3 mb-4 flex items-center justify-between">
+                    <h2 class="text-base font-bold text-sky-400 flex items-center gap-2">
+                        <i class="fa-solid fa-square-root-variable"></i>
+                        <span class="lang-bn">বিশুদ্ধ NumPy ভিত্তিক মাসিক মূল্যায়ন ও ফোরকাস্ট অ্যাকুরেসি — {{ selected_year }}-{{ "%02d"|format(selected_month) }}</span>
+                        <span class="lang-en">Pure NumPy Statistical Matrix & Forecast Evaluation — {{ selected_year }}-{{ "%02d"|format(selected_month) }}</span>
+                    </h2>
+                    <span class="text-xs text-emerald-400 font-mono">{{ monthly_stats.record_count }} Hours</span>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                    <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 block mb-1"><span class="lang-bn">গড় তাপমাত্রা</span><span class="lang-en">Mean Temperature</span></span>
+                        <span class="text-xl font-bold text-emerald-400">{{ "%.2f"|format(monthly_stats.mean_temp) }} °C</span>
+                    </div>
+                    <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 block mb-1"><span class="lang-bn">আদর্শ বিচ্যুতি (σ)</span><span class="lang-en">Standard Deviation (σ)</span></span>
+                        <span class="text-xl font-bold text-slate-200">±{{ "%.2f"|format(monthly_stats.std_temp) }} °C</span>
+                    </div>
+                    <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 block mb-1"><span class="lang-bn">সর্বনিম্ন / সর্বোচ্চ</span><span class="lang-en">Min / Max Temp</span></span>
+                        <span class="text-xl font-bold text-sky-400">{{ "%.1f"|format(monthly_stats.min_temp) }}° / {{ "%.1f"|format(monthly_stats.max_temp) }}°</span>
+                    </div>
+                    <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 block mb-1"><span class="lang-bn">মোট বৃষ্টিপাত</span><span class="lang-en">Total Rainfall</span></span>
+                        <span class="text-xl font-bold text-sky-300">{{ "%.2f"|format(monthly_stats.total_rainfall) }} mm</span>
+                    </div>
+                    <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 block mb-1"><span class="lang-bn">বৃষ্টির ঘণ্টা</span><span class="lang-en">Rainy Hours</span></span>
+                        <span class="text-xl font-bold text-amber-300">{{ monthly_stats.rainy_hours_count }} hrs</span>
+                    </div>
+                    <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 block mb-1"><span class="lang-bn">সহসম্পর্ক (T, RH)</span><span class="lang-en">Temp-RH Corr</span></span>
+                        <span class="text-xl font-bold text-indigo-400">{{ "%.3f"|format(monthly_stats.temp_humidity_corr) }}</span>
+                    </div>
+                    <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 block mb-1"><span class="lang-bn">ফোরকাস্ট MAE</span><span class="lang-en">Forecast MAE</span></span>
+                        <span class="text-xl font-bold text-rose-400">{{ eval_metrics.mae }} °C</span>
+                    </div>
+                    <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 block mb-1"><span class="lang-bn">ফোরকাস্ট RMSE</span><span class="lang-en">Forecast RMSE</span></span>
+                        <span class="text-xl font-bold text-amber-400">{{ eval_metrics.rmse }} °C</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- 9. VIEW: DYNAMIC EXTREME EVENTS SCREENING -->
+        <!-- ========================================================= -->
+        <div id="v-extremes" class="view-panel space-y-6">
+            <div class="bg-[#0e1626] border border-slate-800 rounded-2xl p-6 space-y-5">
+                <div class="border-b border-slate-800 pb-3 flex items-center justify-between">
+                    <h2 class="text-base font-bold text-rose-400 flex items-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span class="lang-bn">{{ selected_year }} সালের চরম আবহাওয়া স্ক্রিনিং ({{ selected_thana }})</span>
+                        <span class="lang-en">Extreme Weather Screening for Year {{ selected_year }} ({{ selected_thana }})</span>
+                    </h2>
+                    <span class="text-xs text-slate-400 font-mono">Dynamic Filter Active</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
+                        <span class="text-slate-400 block mb-1"><span class="lang-bn">তীব্র হিটওয়েভ ঘণ্টা (≥৩৫°C)</span><span class="lang-en">Heatwave Hours (≥35°C)</span></span>
+                        <span class="text-3xl font-black text-rose-400">{{ extremes_year.heatwaves|length }}</span>
+                        <span class="block text-[11px] text-slate-500 mt-1">Selected Month: {{ extremes_month.heatwaves|length }} hrs</span>
+                    </div>
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
+                        <span class="text-slate-400 block mb-1"><span class="lang-bn">ভারী বর্ষণ ঘণ্টা (≥১২mm/hr)</span><span class="lang-en">Heavy Downpours (≥12mm/hr)</span></span>
+                        <span class="text-3xl font-black text-sky-400">{{ extremes_year.heavy_rains|length }}</span>
+                        <span class="block text-[11px] text-slate-500 mt-1">Selected Month: {{ extremes_month.heavy_rains|length }} hrs</span>
+                    </div>
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
+                        <span class="text-slate-400 block mb-1"><span class="lang-bn">দমকা হাওয়া ও ঝড় (≥১০m/s)</span><span class="lang-en">High Wind Squalls (≥10m/s)</span></span>
+                        <span class="text-3xl font-black text-amber-400">{{ extremes_year.squalls|length }}</span>
+                        <span class="block text-[11px] text-slate-500 mt-1">Selected Month: {{ extremes_month.squalls|length }} hrs</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- 10. VIEW: HOURLY RECORDS TABLE WITH INSTANT SEARCH -->
+        <!-- ========================================================= -->
+        <div id="v-records" class="view-panel space-y-6">
+            <div class="bg-[#0e1626] border border-slate-800 rounded-2xl p-6 space-y-4">
+                <div class="border-b border-slate-800 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <h2 class="text-base font-bold text-slate-100 flex items-center gap-2">
+                        <i class="fa-solid fa-table-list text-emerald-400"></i>
+                        <span class="lang-bn">ঘণ্টাওয়ারী পর্যবেক্ষণ লগ: {{ selected_thana }} ({{ selected_year }}-{{ "%02d"|format(selected_month) }}-{{ "%02d"|format(selected_day) }})</span>
+                        <span class="lang-en">Hourly Weather Log: {{ selected_thana }} ({{ selected_year }}-{{ "%02d"|format(selected_month) }}-{{ "%02d"|format(selected_day) }})</span>
+                    </h2>
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="tableSearchInput" onkeyup="filterHourlyTable()" placeholder="Search hour, temp, status..." class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
+                    </div>
+                </div>
+                <div class="overflow-x-auto max-h-96 overflow-y-auto">
+                    <table id="hourlyTable" class="w-full text-left text-xs text-slate-300">
+                        <thead class="bg-slate-950 text-slate-400 uppercase text-[10px] tracking-wider sticky top-0 border-b border-slate-800">
+                            <tr>
+                                <th class="py-2.5 px-3">Hour</th>
+                                <th class="py-2.5 px-3">Temp</th>
+                                <th class="py-2.5 px-3">Feels Like</th>
+                                <th class="py-2.5 px-3">Humidity</th>
+                                <th class="py-2.5 px-3">Rainfall</th>
+                                <th class="py-2.5 px-3">Pressure</th>
+                                <th class="py-2.5 px-3">Wind</th>
+                                <th class="py-2.5 px-3">Commute</th>
+                                <th class="py-2.5 px-3 text-right">Quick Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/60 font-mono">
+                            {% for r in hourly_records %}
+                            <tr class="hover:bg-slate-800/40 transition hourly-row">
+                                <td class="py-2 px-3 text-slate-400">{{ "%02d:00"|format(r.hour) }}</td>
+                                <td class="py-2 px-3 text-emerald-400 font-bold">{{ "%.2f"|format(r.temp) }}°C</td>
+                                <td class="py-2 px-3 text-slate-300">{{ "%.2f"|format(r.feels_like) }}°C</td>
+                                <td class="py-2 px-3">{{ "%.1f"|format(r.humidity) }}%</td>
+                                <td class="py-2 px-3 text-sky-400">{{ "%.2f"|format(r.rain) }} mm</td>
+                                <td class="py-2 px-3 text-slate-400">{{ "%.2f"|format(r.pressure) }} kPa</td>
+                                <td class="py-2 px-3 text-slate-400">{{ "%.2f"|format(r.wind) }} m/s</td>
+                                <td class="py-2 px-3">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-sans font-bold
+                                        {% if r.commute_color == 'rose' %}bg-rose-500/20 text-rose-300
+                                        {% elif r.commute_color == 'amber' %}bg-amber-500/20 text-amber-300
+                                        {% else %}bg-emerald-500/20 text-emerald-300{% endif %}">
+                                        {{ r.commute_status }}
+                                    </span>
+                                </td>
+                                <td class="py-2 px-3 text-right">
+                                    <button type="button" onclick="loadRecordForEdit({{ selected_year }}, {{ selected_month }}, {{ selected_day }}, {{ r.hour }}, {{ r.raw_temp }}, {{ r.humidity }}, {{ r.pressure }}, {{ r.wind }}, {{ r.rain }})" class="text-sky-400 hover:text-sky-300 font-sans text-[11px] font-bold mr-2">
+                                        <i class="fa-solid fa-pen-to-square"></i> Edit
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- 11. VIEW: FULL CRUD LAB (F-1, F-3, F-4, F-7) -->
+        <!-- ========================================================= -->
+        <div id="v-crud" class="view-panel space-y-6">
+            <div class="bg-[#0e1626] border border-slate-800 rounded-2xl p-6 max-w-4xl space-y-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 pb-3 gap-3">
+                    <div>
+                        <h2 class="text-base font-bold text-emerald-400 flex items-center gap-2">
+                            <i class="fa-solid fa-database"></i>
+                            <span class="lang-bn">পূর্ণাঙ্গ রেকর্ড ম্যানেজমেন্ট (Add, Update, Delete & Save Working CSV)</span>
+                            <span class="lang-en">Full Record Management & Validation Lab (F-1, F-3, F-4, F-7)</span>
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-1">
+                            <span class="lang-bn">অবৈধ মান (যেমন আর্দ্রতা ১০১% বা তাপমাত্রা ৯০°C) ইনপুট দিলে সিস্টেম তা প্রতিহত করবে।</span>
+                            <span class="lang-en">Test range validation rules (e.g., Humidity > 100% or Pressure outside 80–110 kPa is rejected) and persist changes to CSV.</span>
+                        </p>
+                    </div>
+                    <form method="POST" action="/">
+                        <input type="hidden" name="action" value="save_csv">
+                        <input type="hidden" name="active_tab" value="v-crud">
+                        <button type="submit" class="bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-xs px-4 py-2 rounded-xl transition flex items-center gap-1.5 shadow-lg">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            <span class="lang-bn">Working CSV সেভ করুন</span><span class="lang-en">Save Working CSV</span>
+                        </button>
+                    </form>
+                </div>
+
+                {% if crud_feedback %}
+                <div class="p-4 rounded-xl text-xs font-bold border {% if crud_feedback.status == 'error' %}bg-rose-500/10 border-rose-500/40 text-rose-300{% else %}bg-emerald-500/10 border-emerald-500/40 text-emerald-300{% endif %}">
+                    <span class="lang-bn">{{ crud_feedback.msg_bn }}</span>
+                    <span class="lang-en">{{ crud_feedback.msg_en }}</span>
+                </div>
+                {% endif %}
+
+                <form method="POST" action="/" id="crudForm" class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-xs">
+                    <input type="hidden" name="action" id="crudActionInput" value="add_record">
+                    <input type="hidden" name="active_tab" value="v-crud">
+                    <div>
+                        <label class="text-slate-400 block mb-1">Year (1900-2100)</label>
+                        <input type="number" id="c_year" name="c_year" value="2025" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white font-mono">
+                    </div>
+                    <div>
+                        <label class="text-slate-400 block mb-1">Month (1-12)</label>
+                        <input type="number" id="c_month" name="c_month" value="1" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white font-mono">
+                    </div>
+                    <div>
+                        <label class="text-slate-400 block mb-1">Day (1-31)</label>
+                        <input type="number" id="c_day" name="c_day" value="1" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white font-mono">
+                    </div>
+                    <div>
+                        <label class="text-slate-400 block mb-1">Hour (0-23)</label>
+                        <input type="number" id="c_hour" name="c_hour" value="0" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white font-mono">
+                    </div>
+                    <div>
+                        <label class="text-slate-400 block mb-1">Temp °C (-60 to 60)</label>
+                        <input type="number" step="0.01" id="c_temp" name="c_temp" value="20.0" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-emerald-400 font-bold font-mono">
+                    </div>
+                    <div>
+                        <label class="text-slate-400 block mb-1">Humidity % (0 to 100)</label>
+                        <input type="number" step="0.01" id="c_rh" name="c_rh" value="101" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-rose-400 font-bold font-mono">
+                    </div>
+                    <div>
+                        <label class="text-slate-400 block mb-1">Pressure kPa (80-110)</label>
+                        <input type="number" step="0.01" id="c_ps" name="c_ps" value="101.0" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white font-mono">
+                    </div>
+                    <div>
+                        <label class="text-slate-400 block mb-1">Wind m/s (0-100)</label>
+                        <input type="number" step="0.01" id="c_ws" name="c_ws" value="2.0" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white font-mono">
+                    </div>
+                    <div>
+                        <label class="text-slate-400 block mb-1">Rain mm/hr (0-300)</label>
+                        <input type="number" step="0.01" id="c_rain" name="c_rain" value="0.0" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white font-mono">
+                    </div>
+                    <div class="col-span-2 sm:col-span-3 pt-3 flex flex-wrap gap-3">
+                        <button type="submit" onclick="document.getElementById('crudActionInput').value='add_record'" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black px-5 py-2.5 rounded-xl transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-plus"></i>
+                            <span class="lang-bn">নতুন রেকর্ড যোগ করুন (F-1)</span><span class="lang-en">Add New Record (F-1)</span>
+                        </button>
+                        <button type="submit" onclick="document.getElementById('crudActionInput').value='update_record'" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-5 py-2.5 rounded-xl transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-pen"></i>
+                            <span class="lang-bn">বিদ্যমান রেকর্ড আপডেট করুন (F-3)</span><span class="lang-en">Update Existing Record (F-3)</span>
+                        </button>
+                        <button type="submit" onclick="document.getElementById('crudActionInput').value='delete_record'" class="bg-rose-500 hover:bg-rose-400 text-white font-black px-5 py-2.5 rounded-xl transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-trash"></i>
+                            <span class="lang-bn">রেকর্ড মুছুন (F-4)</span><span class="lang-en">Delete Observation (F-4)</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // 1. Language Toggle
+        if (localStorage.getItem('dhaka_lang') === 'en') {
+            document.body.classList.add('english-mode');
+        }
+
+        function toggleLang() {
+            document.body.classList.toggle('english-mode');
+            const isEn = document.body.classList.contains('english-mode');
+            localStorage.setItem('dhaka_lang', isEn ? 'en' : 'bn');
+            runSimulation();
+        }
+
+        // 2. View Switcher
+        function openView(viewId, btnElement) {
+            document.querySelectorAll('.view-panel').forEach(v => v.classList.remove('active'));
+            const targetPanel = document.getElementById(viewId);
+            if (targetPanel) targetPanel.classList.add('active');
+
+            const tabInput = document.getElementById('activeTabInput');
+            if (tabInput) tabInput.value = viewId;
+
+            document.querySelectorAll('.nav-item').forEach(b => {
+                b.classList.remove('bg-emerald-500/10', 'text-emerald-400', 'border', 'border-emerald-500/30');
+                b.classList.add('text-slate-400');
+            });
+
+            const activeBtn = btnElement || document.querySelector(`.nav-item[data-target="${viewId}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-emerald-500/10', 'text-emerald-400', 'border', 'border-emerald-500/30');
+                activeBtn.classList.remove('text-slate-400');
+            }
+        }
+
+        function loadRecordForEdit(y, m, d, h, temp, rh, ps, ws, rain) {
+            document.getElementById('c_year').value = y;
+            document.getElementById('c_month').value = m;
+            document.getElementById('c_day').value = d;
+            document.getElementById('c_hour').value = h;
+            document.getElementById('c_temp').value = temp;
+            document.getElementById('c_rh').value = rh;
+            document.getElementById('c_ps').value = ps;
+            document.getElementById('c_ws').value = ws;
+            document.getElementById('c_rain').value = rain;
+            openView('v-crud', null);
+        }
+
+        function filterHourlyTable() {
+            const q = document.getElementById('tableSearchInput').value.toLowerCase();
+            document.querySelectorAll('.hourly-row').forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(q) ? '' : 'none';
+            });
+        }
+
+        // 3. What-If Simulator Logic
+        const thanaDrainScore = {{ thana_info.drain_score }};
+        function runSimulation() {
+            const t = parseFloat(document.getElementById('simTemp').value);
+            const rh = parseFloat(document.getElementById('simRh').value);
+            const rain = parseFloat(document.getElementById('simRain').value);
+            const wind = parseFloat(document.getElementById('simWind').value);
+            const isEn = document.body.classList.contains('english-mode');
+
+            document.getElementById('simTempVal').innerText = t.toFixed(1) + ' °C';
+            document.getElementById('simRhVal').innerText = rh.toFixed(0) + ' %';
+            document.getElementById('simRainVal').innerText = rain.toFixed(0) + ' mm';
+            document.getElementById('simWindVal').innerText = wind.toFixed(1) + ' m/s';
+
+            const feels = t >= 25.0 ? (-8.784 + 1.611*t + 2.338*(rh/10) - 0.146*t*(rh/10)) : t;
+            document.getElementById('simFeelsOut').innerText = feels.toFixed(1) + ' °C';
+
+            const heatBadge = document.getElementById('simHeatBadge');
+            if (feels >= 41) {
+                heatBadge.innerText = 'DANGER / HEAT STROKE';
+                heatBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 w-max';
+            } else if (feels >= 32) {
+                heatBadge.innerText = 'EXTREME CAUTION';
+                heatBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 w-max';
+            } else {
+                heatBadge.innerText = 'SAFE / COMFORTABLE';
+                heatBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 w-max';
+            }
+
+            const floodCm = (rain * (thanaDrainScore / 18.0));
+            document.getElementById('simFloodOut').innerText = floodCm.toFixed(1) + ' cm';
+            const floodBadge = document.getElementById('simFloodBadge');
+            if (floodCm >= 15) {
+                floodBadge.innerText = 'CRITICAL INUNDATION';
+                floodBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 w-max';
+            } else if (floodCm >= 6) {
+                floodBadge.innerText = 'MODERATE WATERLOGGING';
+                floodBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 w-max';
+            } else {
+                floodBadge.innerText = 'NORMAL RUNOFF';
+                floodBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 w-max';
+            }
+
+            const comfort = Math.max(10, Math.min(100, Math.round(100 - Math.max(0, (t - 26)*4.5) - Math.max(0, (rh - 65)*0.6))));
+            const cloudAtten = Math.min(0.75, (rain * 0.01) + Math.max(0, (rh - 55)/100));
+            const solar = (5.5 * (1 - cloudAtten * 0.6)).toFixed(1);
+            document.getElementById('simComfortOut').innerText = `${comfort}% | ${solar} kWh`;
+
+            const dengueHigh = (t >= 25 && t <= 32.5 && rh >= 72);
+            const gridLoad = Math.min(100, Math.max(15, Math.round((t - 20)*5.2 + (rh - 50)*0.4)));
+            document.getElementById('simDengueOut').innerText = `${dengueHigh ? 'HIGH' : 'MODERATE'} | ${gridLoad}% Grid`;
+
+            let advice = "";
+            if (isEn) {
+                advice = `At ${t}°C & ${rh}% RH, apparent temperature reaches ${feels.toFixed(1)}°C. `;
+                advice += floodCm >= 10 ? `Expect ~${floodCm.toFixed(1)} cm street waterlogging in ${ '{{ selected_thana }}' }; avoid underpasses.` : `Runoff safely within drainage capacity.`;
+            } else {
+                advice = `${t}°C তাপমাত্রা ও ${rh}% আর্দ্রতায় অনুভূত উষ্ণতা ${feels.toFixed(1)}°C-এ পৌঁছাবে। `;
+                advice += floodCm >= 10 ? `প্রধান সড়কে প্রায় ${floodCm.toFixed(1)} সেমি জলাবদ্ধতা তৈরি হতে পারে; সাবধানে যাতায়াত করুন।` : `বৃষ্টিপাত নালা দিয়ে স্বাভাবিকভাবে নিষ্কাশিত হবে।`;
+            }
+            document.getElementById('simAdviceOut').innerText = advice;
+        }
+
+        function resetSimulator() {
+            document.getElementById('simTemp').value = 34.0;
+            document.getElementById('simRh').value = 78;
+            document.getElementById('simRain').value = 42;
+            document.getElementById('simWind').value = 4.5;
+            runSimulation();
+        }
+
+        // 4. Draw Heat Stress Arc Gauge Diagram
+        function drawHeatArcGauge() {
+            const canvas = document.getElementById('heatGaugeCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+            const cx = w / 2;
+            const cy = h - 10;
+            const radius = 75;
+
+            ctx.clearRect(0, 0, w, h);
+
+            // Draw Background Arc
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, Math.PI, 0, false);
+            ctx.lineWidth = 14;
+            ctx.strokeStyle = '#1e293b';
+            ctx.stroke();
+
+            // Gradient Arc (Green -> Yellow -> Red)
+            const grad = ctx.createLinearGradient(0, cy, w, cy);
+            grad.addColorStop(0, '#10b981');
+            grad.addColorStop(0.5, '#f59e0b');
+            grad.addColorStop(1, '#f43f5e');
+
+            const currentHi = Math.min(50, Math.max(15, {{ health.apparent_temp }}));
+            const pct = (currentHi - 15) / (50 - 15);
+            const endAngle = Math.PI + pct * Math.PI;
+
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, Math.PI, endAngle, false);
+            ctx.lineWidth = 14;
+            ctx.strokeStyle = grad;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+        }
+
+        // 5. Initialize Charts
+        window.addEventListener('DOMContentLoaded', () => {
+            const initialTab = "{{ active_tab }}" || "v-overview";
+            openView(initialTab, null);
+            runSimulation();
+            drawHeatArcGauge();
+        });
+
+        // Hourly Trend
+        new Chart(document.getElementById('hourlyTrendChart'), {
+            type: 'line',
+            data: {
+                labels: {{ chart_24h_labels | tojson }},
+                datasets: [
+                    { label: 'Air Temp (°C)', data: {{ chart_24h_temps | tojson }}, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.12)', fill: true, tension: 0.35 },
+                    { label: 'Feels Like Heat Index (°C)', data: {{ chart_24h_feels | tojson }}, borderColor: '#f43f5e', borderDash: [5, 5], tension: 0.35 }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#cbd5e1', font: { size: 11 } } } }, scales: { x: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } }, y: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } } } }
+        });
+
+        // Seasonal Trend
+        new Chart(document.getElementById('seasonalTrendChart'), {
+            type: 'bar',
+            data: {
+                labels: {{ month_names | tojson }},
+                datasets: [
+                    { type: 'line', label: 'Mean Temp (°C)', data: {{ seasonal_temps | tojson }}, borderColor: '#38bdf8', yAxisID: 'y' },
+                    { type: 'bar', label: 'Total Rain (mm)', data: {{ seasonal_rains | tojson }}, backgroundColor: 'rgba(56, 189, 248, 0.35)', yAxisID: 'y1' }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#cbd5e1', font: { size: 10 } } } }, scales: { x: { ticks: { color: '#64748b' } }, y: { position: 'left', ticks: { color: '#38bdf8' }, grid: { color: '#1e293b' } }, y1: { position: 'right', ticks: { color: '#94a3b8' }, grid: { display: false } } } }
+        });
+
+        // Multi-Year
+        new Chart(document.getElementById('multiYearChart'), {
+            type: 'bar',
+            data: {
+                labels: {{ yearly_labels | tojson }},
+                datasets: [{ label: 'Annual Mean Temp (°C)', data: {{ yearly_avg_temps | tojson }}, backgroundColor: '#f59e0b', borderRadius: 6 }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#cbd5e1', font: { size: 10 } } } }, scales: { x: { ticks: { color: '#64748b' } }, y: { ticks: { color: '#f59e0b' }, grid: { color: '#1e293b' } } } }
+        });
+
+        // 8-Thana Radar
+        new Chart(document.getElementById('thanaRadarChart'), {
+            type: 'radar',
+            data: {
+                labels: ['Heat Stress', 'Drainage Risk', 'Dengue Risk', 'Green Canopy', 'Outdoor Comfort'],
+                datasets: [
+                    {
+                        label: '{{ selected_thana }}',
+                        data: [{{ radar_heat_score }}, {{ thana_info.drain_score }}, {{ novel.dengue_score }}, {{ thana_info.green_score }}, {{ novel.comfort_score }}],
+                        backgroundColor: 'rgba(16, 185, 129, 0.25)',
+                        borderColor: '#10b981',
+                        pointBackgroundColor: '#10b981'
+                    },
+                    {
+                        label: 'Old Dhaka (Benchmark)',
+                        data: [92, 82, 85, 15, 35],
+                        backgroundColor: 'rgba(244, 63, 94, 0.15)',
+                        borderColor: '#f43f5e',
+                        pointBackgroundColor: '#f43f5e'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { labels: { color: '#cbd5e1', font: { size: 10 } } } },
+                scales: { r: { angleLines: { color: '#1e293b' }, grid: { color: '#1e293b' }, pointLabels: { color: '#94a3b8', font: { size: 10 } }, ticks: { display: false }, min: 0, max: 100 } }
+            }
+        });
+
+        // Polar Wind Vector Compass
+        new Chart(document.getElementById('windPolarChart'), {
+            type: 'polarArea',
+            data: {
+                labels: ['00-06h', '06-12h', '12-18h', '18-24h'],
+                datasets: [{
+                    data: [
+                        {{ "%.1f"|format(hourly_records[3].wind) }},
+                        {{ "%.1f"|format(hourly_records[9].wind) }},
+                        {{ "%.1f"|format(hourly_records[15].wind) }},
+                        {{ "%.1f"|format(hourly_records[21].wind) }}
+                    ],
+                    backgroundColor: [
+                        'rgba(56, 189, 248, 0.4)',
+                        'rgba(16, 185, 129, 0.4)',
+                        'rgba(245, 158, 11, 0.4)',
+                        'rgba(168, 85, 247, 0.4)'
+                    ],
+                    borderColor: '#0f172a'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 9 } } } },
+                scales: { r: { grid: { color: '#1e293b' }, ticks: { display: false } } }
+            }
+        });
+    </script>
+</body>
+</html>
