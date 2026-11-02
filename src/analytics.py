@@ -1,6 +1,4 @@
 # File: src/analytics.py
-# Purpose: High-speed statistical evaluations & multi-parameter correlation matrix using NumPy
-
 import numpy as np
 
 def calculate_monthly_metrics(records, year, month):

@@ -1,6 +1,4 @@
 # File: app.py
-# Purpose: 10X Scientific Weather Intelligence, Simulator, Diagrams & Multi-Thana Decision Support System
-
 import os
 import csv
 import numpy as np
