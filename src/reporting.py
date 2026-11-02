@@ -1,6 +1,4 @@
 # File: src/reporting.py
-# Purpose: Handles persistent storage and multi-format exports (TXT, JSON, CSV)
-
 import os
 import json
 import csv
