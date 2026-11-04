@@ -113,10 +113,10 @@ def run_cli_app(manager):
             fc = compute_rolling_forecast(manager.get_records_by_date(2023, 7, 15))
             health = assess_heat_stress(35.2, 78.0)
             drain = assess_drainage_stress(manager.get_records_by_date(2023, 7, 15)[:6])
-            
+
             txt_path = "output/Dhaka_Weather_Audit_Report.txt"
             json_path = "output/Dhaka_Weather_Metrics.json"
-            
+
             export_text_audit(txt_path, stats, fc, health, drain, 2023, 7)
             export_json_metrics(json_path, stats)
 
