@@ -1,0 +1,13 @@
+{
+    "record_count": 744,
+    "mean_temp": 29.019368279569896,
+    "min_temp": 24.78,
+    "max_temp": 34.83,
+    "median_temp": 28.525,
+    "std_temp": 2.119460015391486,
+    "mean_humidity": 88.11739247311827,
+    "mean_pressure": 100.17493279569894,
+    "total_rainfall": 295.11,
+    "rainy_hours_count": 720,
+    "temp_humidity_corr": -0.9677459112969883
+}
