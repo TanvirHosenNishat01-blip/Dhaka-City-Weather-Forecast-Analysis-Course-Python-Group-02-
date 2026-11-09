@@ -1,0 +1,28 @@
+====================================================================
+     DHAKA WEATHER FORECAST & PUBLIC HEALTH AUDIT REPORT
+     Target Period: 2023-07 | Location: Dhaka, Bangladesh
+====================================================================
+
+[1] NUMERICAL METRICS SUMMARY (Pure NumPy):
+  * Total Hours Evaluated   : 744
+  * Average Temperature      : 29.02 °C
+  * Min / Max Temperature    : 24.78 °C / 34.83 °C
+  * Standard Deviation       : 2.12 °C
+  * Total Rainfall Recorded  : 295.11 mm (720 rainy hours)
+  * Temp-Humidity Correlation: -0.968
+
+[2] 24-HOUR ROLLING FORECAST & UNCERTAINTY:
+  * Projected Mean Temp      : 28.56 °C (±1.91)
+  * Confidence Range (68%)   : 26.66 °C - 30.47 °C
+  * Meteorological Condition : Stable / Moderate Weather
+
+[3] PUBLIC HEALTH & HEAT INDEX ASSESSMENT:
+  * Feels-Like Temperature   : 26.1 °C
+  * Physiological Risk Level : NORMAL / LOW RISK
+  * Safety Advisory Guidelines:
+     - Thermal conditions are comfortable and safe for outdoor activities.
+
+[4] URBAN DRAINAGE & COMMUTER IMPACT:
+  * Status                   : NORMAL / LOW RUNOFF
+  * Impact Assessment        : Cumulative precipitation (2.9 mm in 6 hrs) is safely within urban drainage capacity.
+====================================================================
